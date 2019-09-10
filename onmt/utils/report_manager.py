@@ -14,7 +14,7 @@ def build_report_manager(opt, gpu_rank):
         tensorboard_log_dir = opt.tensorboard_log_dir
 
         if not opt.train_from:
-            tensorboard_log_dir += datetime.now().strftime("/%b-%d_%H-%M-%S")
+            tensorboard_log_dir += datetime.now().strftime("/%b-%d_%H-%M-%S/")
 
         writer = SummaryWriter(tensorboard_log_dir, comment="Unmt")
     else:
@@ -98,6 +98,12 @@ class ReportMgrBase(object):
     def _report_step(self, *args, **kwargs):
         raise NotImplementedError()
 
+    def report_model(self, model, *args):
+        self._report_model(model, *args)
+
+    def _report_model(self, model, *args):
+        raise NotImplementedError()
+
 
 class ReportMgr(ReportMgrBase):
     def __init__(self, report_every, start_time=-1., tensorboard_writer=None):
@@ -156,3 +162,8 @@ class ReportMgr(ReportMgrBase):
                                        "valid",
                                        lr,
                                        step)
+
+    def _report_model(self, model, *args):
+        if self.tensorboard_writer is not None:
+            full_model = onmt.models.model.ModelGraph(model)
+            self.tensorboard_writer.add_graph(full_model, args,)

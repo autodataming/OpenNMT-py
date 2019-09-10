@@ -50,3 +50,18 @@ class NMTModel(nn.Module):
     def update_dropout(self, dropout):
         self.encoder.update_dropout(dropout)
         self.decoder.update_dropout(dropout)
+
+
+class ModelGraph(nn.Module):
+    """Only tensors and (possibly nested) tuples of tensors, lists, or dicts
+    are supported as inputs or outputs of traced functions. (Pytorch)
+    """
+    def __init__(self, model):
+        super(ModelGraph, self).__init__()
+        assert isinstance(model, NMTModel)
+        self.model = model
+
+    def forward(self, *args):
+        out, attns = self.model(*args)
+        # TODO: generalise this module to support random Model's output
+        return out

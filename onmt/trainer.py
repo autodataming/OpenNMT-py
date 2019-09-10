@@ -347,6 +347,11 @@ class Trainer(object):
             tgt_outer = batch.tgt
 
             bptt = False
+
+            if self.optim.training_step == 1 and k == 0:
+                # add model graph to tensorboard log if enable tensorboard
+                self._maybe_report_model(src, tgt_outer, src_lengths)
+
             for j in range(0, target_size-1, trunc_size):
                 # 1. Create truncated target.
                 tgt = tgt_outer[j: j + trunc_size]
@@ -454,3 +459,8 @@ class Trainer(object):
             return self.report_manager.report_step(
                 learning_rate, step, train_stats=train_stats,
                 valid_stats=valid_stats)
+
+    def _maybe_report_model(self, *args):
+        if self.report_manager is not None:
+            return self.report_manager.report_model(
+                self.model, *args)
