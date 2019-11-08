@@ -82,7 +82,7 @@ def start(config_file,
             out = [[] for _ in range(n_best)]
             for i in range(len(trans)):
                 response = {"src": inputs[i // n_best]['src'], "tgt": trans[i],
-                            "n_best": n_best, "pred_score": scores[i]}
+                            "n_best": i, "pred_score": scores[i]}
                 out[i % n_best].append(response)
         except ServerModelError as e:
             out['error'] = str(e)
